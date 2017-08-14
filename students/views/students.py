@@ -22,7 +22,7 @@ def students_list(request):
          'image': 'img/3.jpg'},
     )
     return render(request, 'students/students_list.html',
-        {}) # 'students: students' - у словнику
+        {'students': students})
 
 def students_add(request):
     return HttpResponse('<h1>Student Add Form</h1>')
