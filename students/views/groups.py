@@ -17,6 +17,7 @@ def groups_list(request):
     )
     return render(request, 'students/groups_list.html',
                   {'groups': groups})
+
 def groups_add(request):
     return HttpResponse('<h1>Group Add Form</h1>')
 

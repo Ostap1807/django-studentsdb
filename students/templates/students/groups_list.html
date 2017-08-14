@@ -42,17 +42,11 @@
             {% endfor %}
           </tbody>
         </table>
-<!-- End Groups Listing -->
         {% else %}
         <p>Поки немає груп у базі.</p>
         {% endif %}
+<!-- End Groups Listing -->
 
-<nav>
-	<ul class="pagination">
-		<li class="disabled"><a href="#">1</a></li>
-		<li><a href="#">2</a></li>
-		<li><a href="#">Далі</a></li>
-	</ul>
-</nav>
+{% include "students/pagination.html" %}
 
 {% endblock content %}
