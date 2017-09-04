@@ -1,6 +1,11 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 
+from .settings import DEBUG
+from django.conf import settings
+from django.conf.urls.static import static
+
+
 urlpatterns = patterns('',
     #Students urls
     url(r'^$', 'students.views.students.students_list', name='home'),
@@ -34,3 +39,7 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
 
 )
+
+if DEBUG:
+    # serve files from media folder
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
