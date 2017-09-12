@@ -30,7 +30,7 @@ def students_list(request):
         students = paginator.page(paginator.num_pages)
 
     return render(request, 'students/students_list.html',
-        {'students': students})
+                  {'students': students})
 
 def students_add(request):
     return HttpResponse('<h1>Student Add Form</h1>')

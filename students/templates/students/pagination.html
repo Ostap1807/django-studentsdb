@@ -1,3 +1,7 @@
+{% comment %}
+	Students pagination
+{% endcomment %}
+
 {% if students.has_other_pages %}
 {% with order_by=request.GET.order_by reverse=request.GET.reverse %}
 <nav>
@@ -7,6 +11,25 @@
 		<li {% if students.number == p %}class="active"{% endif %}><a href="{% url "home" %}?page={{ p }}&amp;order_by={{ order_by }}&amp;revrse={{ reverse }}">{{ p }}</a></li>
 		{% endfor %}
 		<li><a href="{% url "home" %}?page={{ students.paginator.num_pages }}&amp;order_by={{ order_by }}&amp;revrse={{ reverse }}">&raquo;</a></li>
+	</ul>
+</nav>
+{% endwith %}
+{% endif %}
+
+
+{% comment %}
+	groups pagination
+{% endcomment %}
+
+{% if groups.has_other_pages %}
+{% with order_by=request.GET.order_by reverse=request.GET.reverse %}
+<nav>
+	<ul class="pagination">
+		<li><a href="{% url "groups" %}?page=1&amp;order_by={{ order_by }}&amp;revrse={{ reverse }}">&laquo;</a></li>
+		{% for p in groups.paginator.page_range %}
+		<li {% if groups.number == p %}class="active"{% endif %}><a href="{% url "groups" %}?page={{ p }}&amp;order_by={{ order_by }}&amp;revrse={{ reverse }}">{{ p }}</a></li>
+		{% endfor %}
+		<li><a href="{% url "groups" %}?page={{ groups.paginator.num_pages }}&amp;order_by={{ order_by }}&amp;revrse={{ reverse }}">&raquo;</a></li>
 	</ul>
 </nav>
 {% endwith %}
