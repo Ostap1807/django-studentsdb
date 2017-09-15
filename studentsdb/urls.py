@@ -38,6 +38,7 @@ urlpatterns = patterns('',
 
     #Exams urls
     url(r'^exams/$', 'students.views.exams.exams_list', name='exams'),
+    url(r'^exams/add$', 'students.views.exams.exams_add', name='exams_add'),
 
     url(r'^admin/', include(admin.site.urls)),
 
