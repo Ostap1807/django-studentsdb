@@ -22,4 +22,4 @@ class Exam_result(models.Model):
         blank=False)
 
     def __str__(self):
-        return u"%s (%s)" % (self.exam, self.group)
+        return u"%s" % (self.exam)

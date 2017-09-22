@@ -5,6 +5,7 @@ from django.http import HttpResponse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from ..models import Exam
+from ..models import Exam_result
 
 def exams_list(request):
     exams = Exam.objects.all()
@@ -35,3 +36,10 @@ def exams_list(request):
 
 def exams_add(request):
     return HttpResponse('<h1>Exams adding form</h1>')
+
+def exams_result(request, gid):
+    results_list = Exam_result.objects.filter(exam__exams_group__pk='%s' % gid)
+    return render(request, 'students/exams_results.html', {'results_list': results_list})
+
+def exams_result_add(request):
+    return HttpResponse('<h1>Exams result adding form</h1>')
