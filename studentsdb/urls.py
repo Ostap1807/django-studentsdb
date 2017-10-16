@@ -5,14 +5,16 @@ from .settings import DEBUG
 from django.conf import settings
 from django.conf.urls.static import static
 
+from students.views.students import StudentUpdateView
+
 
 urlpatterns = patterns('',
     #Students urls
     url(r'^$', 'students.views.students.students_list', name='home'),
     url(r'^students/add/$', 'students.views.students.students_add',
          name='students_add'),
-    url(r'^students/(?P<sid>\d+)/edit/$',
-         'students.views.students.students_edit',
+    url(r'^students/(?P<pk>\d+)/edit/$',
+         StudentUpdateView.as_view(),
          name='students_edit'),
     url(r'^students/(?P<sid>\d+)/delete/$',
          'students.views.students.students_delete',
@@ -41,6 +43,10 @@ urlpatterns = patterns('',
     url(r'^exams/add$', 'students.views.exams.exams_add', name='exams_add'),
     url(r'^exams/result/(?P<gid>\d+)/$',
         'students.views.exams.exams_result', name='exams_result'),
+
+    #Contact admin form
+    url(r'^contact-admin/$', 'students.views.contact_admin.contact_admin',
+        name='contact_admin'),
 
     url(r'^admin/', include(admin.site.urls)),
 

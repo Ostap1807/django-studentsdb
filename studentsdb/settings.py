@@ -39,6 +39,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'crispy_forms',
     'students',
 )
 
@@ -101,8 +102,20 @@ STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, '..', 'media')
 
+CRISPY_TEMPLATE_PACK = 'bootstrap3'
+
 TEMPLATE_CONTEXT_PROCESSORS = \
     global_settings.TEMPLATE_CONTEXT_PROCESSORS + (
     "django.core.context_processors.request",
     "studentsdb.context_processors.students_proc",
 )
+
+# email settings
+# please, set here you smtp server details and your admin email
+ADMIN_EMAIL = 'flamaster1807@gmail.com'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = '465'
+EMAIL_HOST_USER = 'flamaster1807@gmail.com'
+EMAIL_HOST_PASSWORD = 'Victoria1101'
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = True
