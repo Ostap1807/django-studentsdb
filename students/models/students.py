@@ -56,7 +56,7 @@ class Student(models.Model):
         verbose_name="Група",
         blank=False,
         null=True,
-        on_delete=models.PROTECT)
+        on_delete=models.SET_NULL)
 
     def __str__(self):
         return u"%s %s" % (self.first_name, self.last_name)
