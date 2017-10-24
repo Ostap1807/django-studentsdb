@@ -6,7 +6,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
 from django.views.generic import DeleteView
 
-from ..models import Group
+from ..models import Group, Student
 
 def groups_list(request):
     groups = Group.objects.all()
