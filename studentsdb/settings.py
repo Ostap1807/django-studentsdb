@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.8/ref/settings/
 """
 from django.conf import global_settings
+from django_smtp_ssl import *
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
