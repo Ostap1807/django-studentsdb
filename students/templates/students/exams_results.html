@@ -16,7 +16,7 @@
             <th><a href="#">№</a></th>
             <th><a href="#">Студент</a></th>
             <th><a href="#">Бал</a></th>
-        </tr>   
+        </tr>
     </thead>
     <tbody>
         {% for result in results_list %}
@@ -30,6 +30,7 @@
 </table>
 {% else %}
 <h1>Результатів не додано</h1>
-{% endif %} 
+<a href="{% url 'exams_result_add' %}" class="btn btn-primary" style="margin-bottom: 20px;">Додати результат іспиту</a>
+{% endif %}
 
-{% endblock content %} 
+{% endblock content %}

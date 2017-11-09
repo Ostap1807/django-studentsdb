@@ -98,12 +98,12 @@ def students_add(request):
             if photo:
                 data['photo'] = photo
 
-            # save student
+            # save group
             if not errors:
-                student = Student(**data)
-                student.save()
+                group = Group(**data)
+                group.save()
 
-                # redirect to students list
+                # redirect to groups list
                 return HttpResponseRedirect(
                     u'%s?status_message=Студента успішно додано!' %
                     reverse('home'))
@@ -125,7 +125,9 @@ def students_add(request):
 class StudentUpdateForm(ModelForm):
     class Meta:
         model = Student
-        fields = "__all__"
+        #fields = "__all__"
+        fields = ['first_name', 'last_name', 'middle_name',
+                  'birthday', 'photo', 'ticket', 'student_group']
 
     def __init__(self, *args, **kwargs):
         super(StudentUpdateForm, self).__init__(*args, **kwargs)

@@ -6,7 +6,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 from students.views.students import StudentUpdateView, StudentDeleteView
-from students.views.groups import GroupDeleteView
+from students.views.groups import GroupUpdateView ,GroupDeleteView
 
 urlpatterns = patterns('',
     #Students urls
@@ -24,8 +24,8 @@ urlpatterns = patterns('',
     url(r'^groups/$', 'students.views.groups.groups_list', name='groups'),
     url(r'^groups/add/$', 'students.views.groups.groups_add',
          name='groups_add'),
-    url(r'^groups/(?P<gid>\d+)/edit/$',
-         'students.views.groups.groups_edit',
+    url(r'^groups/(?P<pk>\d+)/edit/$',
+         GroupUpdateView.as_view(),
          name='groups_edit'),
     url(r'^groups/(?P<pk>\d+)/delete/$',
          GroupDeleteView.as_view(),
@@ -43,6 +43,8 @@ urlpatterns = patterns('',
     url(r'^exams/add$', 'students.views.exams.exams_add', name='exams_add'),
     url(r'^exams/result/(?P<gid>\d+)/$',
         'students.views.exams.exams_result', name='exams_result'),
+    url(r'^exams/result/add$', 'students.views.exams.exams_result_add',
+        name='exams_result_add'),
 
     #Contact admin form
     url(r'^contact-admin/$', 'students.views.contact_admin.contact_admin',
