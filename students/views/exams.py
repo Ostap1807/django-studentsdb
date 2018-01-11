@@ -84,16 +84,16 @@ def exams_add(request):
 
             # save exam
             if not errors:
-                exam = Exam(**data)
-                exam.save()
+                exam_result = Exam_result(**data)
+                exam_result.save()
 
                 # redirect to exams list
                 return HttpResponseRedirect(
-                    u'%s?status_message=Іспит успішно додано!' %
-                    reverse('exams'))
+                    u'%s?status_message=Результат іспит успішно додано!' %
+                    reverse('exams_result'))
             else:
                 # render form with errors and previous user input
-                return render(request, 'students/exams_add.html',
+                return render(request, 'students/exam_results_add.html',
                     {'groups': Group.objects.all().order_by('title'),
                      'errors': errors})
         elif request.POST.get('cancel_button') is not None:
@@ -111,4 +111,68 @@ def exams_result(request, gid):
     return render(request, 'students/exams_results.html', {'results_list': results_list})
 
 def exams_result_add(request):
-    return HttpResponse('<h1>Exams result adding form</h1>')
+    # was form posted?
+    if request.method == "POST":
+        # was form add button clicked?
+        if request.POST.get('add_button') is not None:
+            # errors collection
+            errors = {}
+
+            # data for exam result object
+            data = {}
+
+            # validate user input
+            exam = request.POST.get('exam', '').strip()
+            if not exam:
+                errors['exam'] = u"Оберіть іспит"
+            else:
+                exams = Exam.objects.filter(pk=exam)
+                if len(exams) != 1:
+                    errors['exam'] = u"Оберіть коректний іспит"
+                else:
+                    data['exam'] = exams[0]
+
+            student = request.POST.get('student', '').strip()
+            if not student:
+                errors['student'] = u"Оберіть студента"
+            else:
+                students = Student.objects.filter(pk=student)
+                if len(students) != 1:
+                    errors['student'] = u"Оберіть коректного студента"
+                else:
+                    data['student'] = students[0]
+
+            mark = request.POST.get('mark', '').strip()
+            if not mark:
+                errors['mark'] = u"Бал є обов'язковим"
+            else:
+                # if type(mark) != int:
+                #     errors['mark'] = u"Бал повинен бути цілим числом"
+                # else:
+                data['mark'] = mark
+
+            # save exam result
+            if not errors:
+                exam_result = Exam_result(**data)
+                exam_result.save()
+
+                # redirect to exams  results list
+                return HttpResponseRedirect(
+                    u'%s?status_message=Іспит успішно додано!' %
+                    reverse('home'))
+            else:
+                # render form with errors and previous user input
+                return render(request, 'students/exams_result_add.html',
+                    {'exams': Exam.objects.all().order_by('exams_group'),
+                     'students': Student.objects.all().order_by('last_name'),
+                     'errors': errors})
+        elif request.POST.get('cancel_button') is not None:
+            # redirect to exam results  adding page on cancel button
+            return HttpResponseRedirect(
+                u'%s?status_message=Додавання результату іспиту скасовано!' %
+                reverse('home'))
+    else:
+        # initial form render
+        return render(request, 'students/exams_result_add.html',
+            {'exams': Exam.objects.all().order_by('exams_group'),
+             'students': Student.objects.all().order_by('last_name')})

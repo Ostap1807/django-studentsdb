@@ -6,6 +6,7 @@ from .models.students import Student
 from .models.groups import Group
 from .models.exams import Exam
 from .models.exams_results import Exam_result
+from .models.monthjournal import MonthJournal
 
 class StudentFormAdmin(ModelForm):
 
@@ -41,4 +42,5 @@ admin.site.register(Student, StudentAdmin)
 admin.site.register(Group)
 admin.site.register(Exam)
 admin.site.register(Exam_result)
+admin.site.register(MonthJournal)
 
