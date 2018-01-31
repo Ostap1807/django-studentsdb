@@ -6,17 +6,24 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.forms import ModelForm
-from django.views.generic import UpdateView, DeleteView, CreateView
+from django.views.generic import UpdateView, DeleteView
 
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
 from crispy_forms.bootstrap import FormActions
 
 from ..models import Student, Group
+from ..util import paginate, get_current_group
 
 
 def students_list(request):
-    students = Student.objects.all()
+    # check if we need to show only one group of students
+    current_group = get_current_group(request)
+    if current_group:
+        students = Student.objects.filter(student_group=current_group)
+    else:
+        # otherwise show all students
+        students = Student.objects.all()
 
     # try to order students list
     order_by = request.GET.get('order_by', '')
@@ -25,20 +32,11 @@ def students_list(request):
         if request.GET.get('reverse', '') == '1':
             students = students.reverse()
 
-    # paginate students
-    paginator = Paginator(students, 3)
-    page = request.GET.get('page')
-    try:
-        students = paginator.page(page)
-    except PageNotAnInteger:
-        # If page is not an integer, deliver first page.
-        students = paginator.page(1)
-    except EmptyPage:
-        # If page is out of range (e.g. 9999), deliver last page of results.
-        students = paginator.page(paginator.num_pages)
+    # apply pagination, 3 students per page
+    context = paginate(students, 3, request, {},
+        var_name='students')
 
-    return render(request, 'students/students_list.html',
-        {'students': students})
+    return render(request, 'students/students_list.html', context)
 
 def students_add(request):
     # was form posted?
@@ -98,12 +96,12 @@ def students_add(request):
             if photo:
                 data['photo'] = photo
 
-            # save group
+            # save student
             if not errors:
-                group = Group(**data)
-                group.save()
+                student = Student(**data)
+                student.save()
 
-                # redirect to groups list
+                # redirect to students list
                 return HttpResponseRedirect(
                     u'%s?status_message=Студента успішно додано!' %
                     reverse('home'))
@@ -125,9 +123,7 @@ def students_add(request):
 class StudentUpdateForm(ModelForm):
     class Meta:
         model = Student
-        #fields = "__all__"
-        fields = ['first_name', 'last_name', 'middle_name',
-                  'birthday', 'photo', 'ticket', 'student_group']
+        fields = '__all__'
 
     def __init__(self, *args, **kwargs):
         super(StudentUpdateForm, self).__init__(*args, **kwargs)

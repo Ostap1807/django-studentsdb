@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from django import forms
 from django.shortcuts import render
+from django import forms
 from django.core.mail import send_mail
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
@@ -19,7 +19,7 @@ class ContactForm(forms.Form):
         # this helper object allows us to customize form
         self.helper = FormHelper()
 
-        # form tag atributes
+        # form tag attributes
         self.helper.form_class = 'form-horizontal'
         self.helper.form_method = 'post'
         self.helper.form_action = reverse('contact_admin')
@@ -34,7 +34,7 @@ class ContactForm(forms.Form):
         self.helper.add_input(Submit('send_button', u'Надіслати'))
 
     from_email = forms.EmailField(
-        label=u"Ваша e-mail адреса")
+        label=u"Ваша Емейл Адреса")
 
     subject = forms.CharField(
         label=u"Заголовок листа",
@@ -42,7 +42,6 @@ class ContactForm(forms.Form):
 
     message = forms.CharField(
         label=u"Текст повідомлення",
-        max_length=2560,
         widget=forms.Textarea)
 
 def contact_admin(request):
@@ -75,4 +74,3 @@ def contact_admin(request):
         form = ContactForm()
 
     return render(request, 'contact_admin/form.html', {'form': form})
-

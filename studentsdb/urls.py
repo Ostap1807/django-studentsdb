@@ -1,16 +1,14 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 
-from .settings import DEBUG
-from django.conf import settings
-from django.conf.urls.static import static
-
 from students.views.students import StudentUpdateView, StudentDeleteView
-from students.views.groups import GroupUpdateView ,GroupDeleteView
+from students.views.groups import GroupAddView, GroupUpdateView, GroupDeleteView
 from students.views.journal import JournalView
 
+from .settings import MEDIA_ROOT, DEBUG
+
 urlpatterns = patterns('',
-    #Students urls
+    # Students urls
     url(r'^$', 'students.views.students.students_list', name='home'),
     url(r'^students/add/$', 'students.views.students.students_add',
          name='students_add'),
@@ -21,33 +19,18 @@ urlpatterns = patterns('',
          StudentDeleteView.as_view(),
          name='students_delete'),
 
-    #Groups urls
+    # Groups urls
     url(r'^groups/$', 'students.views.groups.groups_list', name='groups'),
-    url(r'^groups/add/$', 'students.views.groups.groups_add',
-         name='groups_add'),
-    url(r'^groups/(?P<pk>\d+)/edit/$',
-         GroupUpdateView.as_view(),
+    url(r'^groups/add/$', GroupAddView.as_view(), name='groups_add'),
+    url(r'^groups/(?P<pk>\d+)/edit/$', GroupUpdateView.as_view(),
          name='groups_edit'),
-    url(r'^groups/(?P<pk>\d+)/delete/$',
-         GroupDeleteView.as_view(),
+    url(r'^groups/(?P<pk>\d+)/delete/$', GroupDeleteView.as_view(),
          name='groups_delete'),
 
-    #Journal urls
-    url(r'^journal/$', JournalView.as_view(), name='journal'),
-    #url(r'^journal/(?P<sid>\d+)$', 'students.views.journal.journal_student',
-        #name='journal_student'),
-    #url(r'^journal/update/$', 'students.views.journal.journal_update',
-        #name='journal_update'),
+    # Journal urls
+    url(r'^journal/(?P<pk>\d+)?/?$', JournalView.as_view(), name='journal'),
 
-    #Exams urls
-    url(r'^exams/$', 'students.views.exams.exams_list', name='exams'),
-    url(r'^exams/add$', 'students.views.exams.exams_add', name='exams_add'),
-    url(r'^exams/result/(?P<gid>\d+)/$',
-        'students.views.exams.exams_result', name='exams_result'),
-    url(r'^exams/result/add$', 'students.views.exams.exams_result_add',
-        name='exams_result_add'),
-
-    #Contact admin form
+    # Contact Admin Form
     url(r'^contact-admin/$', 'students.views.contact_admin.contact_admin',
         name='contact_admin'),
 
@@ -57,4 +40,6 @@ urlpatterns = patterns('',
 
 if DEBUG:
     # serve files from media folder
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += patterns('',
+        url(r'^media/(?P<path>.*)$', 'django.views.static.serve', {
+        'document_root': MEDIA_ROOT}))

@@ -5,141 +5,99 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.forms import ModelForm
-from django.views.generic import UpdateView, DeleteView, CreateView
+from django.views.generic import CreateView, UpdateView, DeleteView
 
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
 from crispy_forms.bootstrap import FormActions
 
-from ..models import Student, Group
+from ..models import Group
+from ..util import paginate
+
 
 def groups_list(request):
     groups = Group.objects.all()
 
-    # try to order students list
+    # try to order groups list
     order_by = request.GET.get('order_by', '')
-    if order_by in ('id', 'title'):
+    if order_by in ('title',):
         groups = groups.order_by(order_by)
         if request.GET.get('reverse', '') == '1':
             groups = groups.reverse()
 
-    # paginate students
-    paginator = Paginator(groups, 3)
-    page = request.GET.get('page')
-    try:
-        groups = paginator.page(page)
-    except PageNotAnInteger:
-        # If page is not an integer, deliver first page
-        groups = paginator.page(1)
-    except EmptyPage:
-        # If result is out of range (e.g. 9999), deliver
-        # last page of results
-        groups = paginator.page(paginator.num_pages)
+    # apply pagination, 2 groups per page
+    context = paginate(groups, 2, request, {}, var_name='groups')
 
-    return render(request, 'students/groups_list.html',
-                  {'groups': groups})
+    return render(request, 'students/groups_list.html', context)
 
-def groups_add(request):
-    # was form posted?
-    if request.method == "POST":
-        # was form add button clicked?
-        if request.POST.get('add_button') is not None:
-            # errors collection
-            errors = {}
 
-            # data for group object
-            data = {'notes': request.POST.get('notes')}
-
-            title = request.POST.get('title', '').strip()
-            if not title:
-                errors['title'] = u"Назва є обов'язковою"
-            else:
-                data['title'] = title
-
-            leader = request.POST.get('leader', '').strip()
-            if leader == "":
-                data['leader'] = None
-            else:
-                students = Student.objects.filter(pk=leader)
-                if len(students) != 1:
-                    errors['leader'] = u"Оберіть коректного старосту"
-                else:
-                    data['leader'] = students[0]
-
-            # save student
-            if not errors:
-                group = Group(**data)
-                group.save()
-
-                # redirect to students list
-                return HttpResponseRedirect(
-                    u'%s?status_message=Групу успішно додано!' %
-                    reverse('groups'))
-            else:
-                # render form with errors and previous user input
-                return render(request, 'students/groups_add.html',
-                    {'students': Student.objects.all().order_by('last_name'),
-                     'errors': errors})
-        elif request.POST.get('cancel_button') is not None:
-            # redirect to group page on cancel button
-            return HttpResponseRedirect(
-                u'%s?status_message=Додавання групи скасовано!' %
-                reverse('groups'))
-    else:
-        # initial form render
-        return render(request, 'students/groups_add.html',
-                      {'students': Student.objects.all().order_by('last_name')})
-
-class GroupUpdateForm(ModelForm):
+class GroupForm(ModelForm):
     class Meta:
         model = Group
-        #fields = "__all__"
-        fields = ['title', 'leader', 'notes']
+        fields = '__all__'
 
     def __init__(self, *args, **kwargs):
-        super(GroupUpdateForm, self).__init__(*args, **kwargs)
+        super(GroupForm, self).__init__(*args, **kwargs)
 
         self.helper = FormHelper(self)
 
+        # add form or edit form
+        if kwargs['instance'] is None:
+            add_form = True
+        else:
+            add_form = False
+
         # set form tag attributes
-        self.helper.form_action = reverse('groups_edit',
-            kwargs={'pk': kwargs['instance'].id})
+        if add_form:
+            self.helper.form_action = reverse('groups_add')
+        else:
+            self.helper.form_action = reverse('groups_edit',
+                kwargs={'pk': kwargs['instance'].id})
         self.helper.form_method = 'POST'
         self.helper.form_class = 'form-horizontal'
 
         # set form field properties
         self.helper.help_text_inline = True
-        self.helper.html5_required = True
         self.helper.label_class = 'col-sm-2 control-label'
         self.helper.field_class = 'col-sm-10'
 
         # add buttons
+        if add_form:
+            submit = Submit('add_button', u'Додати',
+                css_class="btn btn-primary")
+        else:
+            submit = Submit('save_button', u'Зберегти',
+                css_class="btn btn-primary")
         self.helper.layout[-1] = FormActions(
-            Submit('add_button', u'Зберегти', css_class="btn btn-primary"),
+            submit,
             Submit('cancel_button', u'Скасувати', css_class="btn btn-link"),
         )
 
-class GroupUpdateView(UpdateView):
-    model = Group
-    template_name = 'students/groups_edit.html'
-    form_class = GroupUpdateForm
+class BaseGroupFormView(object):
 
     def get_success_url(self):
-        return u'%s?status_message=Групу успішно збережено!' \
+        return u'%s?status_message=Зміни успішно збережено!' \
             % reverse('groups')
 
     def post(self, request, *args, **kwargs):
+        # handle cancel button
         if request.POST.get('cancel_button'):
-            return HttpResponseRedirect(
-                u'%s?status_message=Редагування групи відмінено!' %
-                reverse('groups'))
+            return HttpResponseRedirect(reverse('groups') +
+                u'?status_message=Зміни скасовано.')
         else:
-            return super(GroupUpdateView, self).post(request, *args, **kwargs)
+            return super(BaseGroupFormView, self).post(
+                request, *args, **kwargs)
 
-class GroupDeleteView(DeleteView):
+class GroupAddView(BaseGroupFormView, CreateView):
+    model = Group
+    form_class = GroupForm
+    template_name = 'students/groups_form.html'
+
+class GroupUpdateView(BaseGroupFormView, UpdateView):
+    model = Group
+    form_class = GroupForm
+    template_name = 'students/groups_form.html'
+
+class GroupDeleteView(BaseGroupFormView, DeleteView):
     model = Group
     template_name = 'students/groups_confirm_delete.html'
-
-    def get_success_url(self):
-        return u'%s?status_message=Групу успішно видалено!' \
-            % reverse('groups')
