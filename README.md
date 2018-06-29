@@ -7,9 +7,15 @@ Realized by **Python 3.5** and **Django 1.8**
 
 ![](img/scr_1.png)
 
+-----------------------
+
 ![](img/scr_2.png)
 
+-----------------------
+
 ![](img/scr_3.png)
+
+-----------------------
 
 ![](img/scr_4.png)
 
@@ -17,7 +23,7 @@ Realized by **Python 3.5** and **Django 1.8**
 
 1. `pip install -r requirements.txt`
 
-1. OPTIONAL `python manage.py loaddata demo_data.json`
+1. Optional - `python manage.py loaddata demo_data.json`
 
 1. `python manage.py migrate`
 
